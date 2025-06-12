@@ -1,3 +1,7 @@
+# Only include the src directory, ignore everything else
+/*
+!/src/
+
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
