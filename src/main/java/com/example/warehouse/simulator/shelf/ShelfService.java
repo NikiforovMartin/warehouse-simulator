@@ -28,13 +28,13 @@ public class ShelfService {
 
         validateShelfCoordinates(command);
         
-        var shelf = new Shelf()
+        Shelf shelf = new Shelf()
                 .setLocationX(command.getLocationX())
                 .setLocationY(command.getLocationY())
                 .setProduct(findProduct(command.getProductId()))
                 .setQuantity(command.getQuantity());
 
-        var savedShelf = repository.save(shelf);
+        Shelf savedShelf = repository.save(shelf);
 
         warehouseUtils.markPosition(savedShelf.getLocationX(), savedShelf.getLocationY(), true);
 
@@ -57,7 +57,7 @@ public class ShelfService {
     public void deleteShelf(long shelfId) {
         log.info("Deleting shelf by ID {}.", shelfId);
 
-        var shelf = repository.findById(shelfId)
+        Shelf shelf = repository.findById(shelfId)
                         .orElseThrow(() -> new EntityNotFoundException("Shelf with ID " + shelfId + " not found."));
 
         repository.delete(shelf);

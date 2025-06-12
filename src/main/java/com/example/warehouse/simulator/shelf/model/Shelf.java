@@ -32,4 +32,7 @@ public class Shelf {
     private Product product;
 
     private long quantity;
+
+    @Version
+    private Long version;
 }

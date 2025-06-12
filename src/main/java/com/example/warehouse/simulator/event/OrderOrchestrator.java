@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class ApplicationOrderEventPublisher {
+public class OrderOrchestrator {
     @Value("${threadWorkers:10}")
     private int threadWorkers;
     private final BlockingQueue<Order> orderQueue = new LinkedBlockingQueue<>();

@@ -1,11 +1,12 @@
 package com.example.warehouse.simulator.order;
 
-import com.example.warehouse.simulator.event.ApplicationOrderEventPublisher;
+import com.example.warehouse.simulator.event.OrderOrchestrator;
 import com.example.warehouse.simulator.order.model.Order;
 import com.example.warehouse.simulator.order.model.request.CreateOrderCommand;
 import com.example.warehouse.simulator.product.ProductRepository;
 import com.example.warehouse.simulator.product.model.Product;
 import com.example.warehouse.simulator.robot.RobotService;
+import com.example.warehouse.simulator.robot.model.Robot;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,7 +27,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final RobotService robotService;
-    private final ApplicationOrderEventPublisher eventPublisher;
+    private final OrderOrchestrator eventPublisher;
 
     public void createOrder(@Valid CreateOrderCommand command) {
         log.info("Creating order with {} items", command.getItems().size());
@@ -38,24 +40,24 @@ public class OrderService {
         }
 
         List<Long> existingProductsIds = existingProducts.stream().map(Product::getId).toList();
-        var nonExistingProducts = orderProductsIds.stream().filter(id -> !existingProductsIds.contains(id)).toList();
+        List<Long> nonExistingProducts = orderProductsIds.stream().filter(id -> !existingProductsIds.contains(id)).toList();
 
         if(!nonExistingProducts.isEmpty()) {
             log.warn("{} products not found: {}", nonExistingProducts.size(), nonExistingProducts);
         }
 
-        var orderItems = existingProducts.stream()
+        Map<Product, Long> orderItems = existingProducts.stream()
                 .collect(Collectors.toMap(
                         product -> product,
                         product -> command.getItems().get(product.getId())
                 ));
 
-        var assignedRobot = robotService.findAvailableRobot();
+        Robot assignedRobot = robotService.findAvailableRobot();
 
-        var order = new Order()
+        Order order = new Order()
                 .setItems(orderItems);
 
-        var savedOrder = orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
 
         log.info("Order with {} items successfully saved. Assigned robot {}.", savedOrder.getItems().size(), assignedRobot.getSerialNumber());
 

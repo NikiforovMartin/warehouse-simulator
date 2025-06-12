@@ -24,7 +24,7 @@ public class Order {
     @GeneratedValue(strategy = IDENTITY)
     private long id;
 
-    @ElementCollection // mejdu order i product gi pravi M:M, ako ne beshe map shteshe da e @MANY_TO_MANY
+    @ElementCollection
     @CollectionTable(name = "order_items")
     @MapKeyJoinColumn(name = "product_id")
     @Column(name = "quantity")
